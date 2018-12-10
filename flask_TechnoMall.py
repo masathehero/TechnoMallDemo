@@ -3,10 +3,11 @@ from flask import Flask, render_template, request, redirect, url_for
 import pandas as pd
 import MeCab
 import gensim
-import sys; sys.path.append('/Users/Yoshida/github/NLP/')
+import sys; sys.path.append('/home/jovyan/work/code/')
 import NLP_tool
 import ProdNameFilter_Module
 import ProdNameFilter_Main
+import DemoPredict_Main as DP
 
 
 def load_module():
@@ -14,7 +15,7 @@ def load_module():
     # dict_path = ''  # 通常辞書
     dict_path = '/usr/local/lib/mecab/dic/mecab-ipadic-neologd/'  # neologdの辞書
     mecabrc_tagger = MeCab.Tagger(f"-d {dict_path} mecabrc")
-    w2v_path = '/Users/Yoshida/Documents/NLP_model/word2vec_model/FastText_Wiki_Neologd_model.vec'
+    w2v_path = '/home/jovyan/work/data/word_vec/FastText_Wiki_Neologd_model.vec'
     w2v = gensim.models.KeyedVectors.load_word2vec_format(w2v_path, binary=False)
     # product_filter用
     onehot = NLP_tool.One_HotVector(mecabrc_tagger=mecabrc_tagger)
@@ -42,10 +43,22 @@ def filter_prod(product, rank_mod=False, nbest=1, weight_mod=False):
     else:
         return tuple([product] + list(filtering.loc[0, ['words', 'category']]))
 
+
 def filter_receipt(receipt):
     filtered_receipt = pd.DataFrame([filter_prod(prod, weight_mod=False) for prod in receipt], columns=['product', 'key_word', 'category'])
     return filtered_receipt
 
+
+def rnn_prediction(rec):
+    DP.data_load()
+    predict_result = DP.main(rec,
+                     DP.Params.n_inputs,
+                     DP.Params.n_outputs,
+                     DP.Params.n_steps,
+                     DP.Params.n_layers,
+                     DP.Params.n_neurons,
+                     DP.Params.learning_rate)
+    return predict_result
 
 # 自身の名称を app という名前でインスタンス化する
 app = Flask(__name__)
@@ -67,20 +80,28 @@ def post():
     title = "Purchase Data Storage"
     message = 'あなたのレシート情報を入力してください'
     if request.method == 'POST':
-        # リクエストフォームから「名前」を取得して
+        # リクエストフォームから、データを取得
         item_ls = [request.form['item%s' % item_id] for item_id in range(1, item_len+1)
                    if request.form['item%s' % item_id] != '']
         print(item_ls)
-        filtered_receipt = filter_receipt(item_ls)
-        result = filtered_receipt.to_html(classes='books')
-        # result = pd.DataFrame(item_ls).to_html(classes='books')  # 動作確認用
 
+        # 商品名のフィルター
+        filtered_receipt = filter_receipt(item_ls)
+        filter_result = filtered_receipt.to_html(classes='filter_table')
         item_ls = item_ls + [None] * (item_len - len(item_ls))
+        # filter_result = pd.DataFrame(item_ls).to_html(classes='filter_table')  # 動作確認用
+
+        # 商品のpredict
+        rec = list(filtered_receipt['key_word'])
+        predict_receipt = rnn_prediction(rec)
+        predict_result = predict_receipt.to_html(classes='pred_table')
+
         # index.html をレンダリングする
         return render_template('index_TechnoMall.html',
                                message=message,
                                title=title,
-                               result=result,
+                               filter_result=filter_result,
+                               predict_result=predict_result,
                                it1=item_ls[0],
                                it2=item_ls[1],
                                it3=item_ls[2],
@@ -96,4 +117,4 @@ if __name__ == '__main__':
     load_module()
     item_len = 5
     app.debug = True  # デバッグモード有効化
-    app.run(host='localhost', port=5555)  # どこからでもアクセス可能に
+    app.run(host='localhost', port=4444)  # どこからでもアクセス可能に
