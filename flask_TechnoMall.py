@@ -3,7 +3,7 @@ from flask import Flask, render_template, request, redirect, url_for
 import pandas as pd
 import MeCab
 import gensim
-import sys; sys.path.append('/home/jovyan/work/code/')
+import sys; sys.path.append('/Users/Yoshida/github/NLP')
 import NLP_tool
 import ProdNameFilter_Module
 import ProdNameFilter_Main
@@ -15,7 +15,8 @@ def load_module():
     # dict_path = ''  # 通常辞書
     dict_path = '/usr/local/lib/mecab/dic/mecab-ipadic-neologd/'  # neologdの辞書
     mecabrc_tagger = MeCab.Tagger(f"-d {dict_path} mecabrc")
-    w2v_path = '/home/jovyan/work/data/word_vec/FastText_Wiki_Neologd_model.vec'
+    # w2v_path = '/home/jovyan/work/data/word_vec/FastText_Wiki_Neologd_model.vec'
+    w2v_path = '~/Documents/NLP_model/word2vec_model/FastText_Wiki_Neologd_model.vec'
     w2v = gensim.models.KeyedVectors.load_word2vec_format(w2v_path, binary=False)
     # product_filter用
     onehot = NLP_tool.One_HotVector(mecabrc_tagger=mecabrc_tagger)
@@ -50,15 +51,15 @@ def filter_receipt(receipt):
 
 
 def rnn_prediction(rec):
-    DP.data_load()
-    predict_result = DP.main(rec,
-                     DP.Params.n_inputs,
-                     DP.Params.n_outputs,
-                     DP.Params.n_steps,
-                     DP.Params.n_layers,
-                     DP.Params.n_neurons,
-                     DP.Params.learning_rate)
-    return predict_result
+    predict_receipt = DP.main(rec,
+                              DP.Params.n_inputs,
+                              DP.Params.n_outputs,
+                              DP.Params.n_steps,
+                              DP.Params.n_layers,
+                              DP.Params.n_neurons,
+                              DP.Params.learning_rate)
+    return predict_receipt[:10].reset_index(drop=True)
+
 
 # 自身の名称を app という名前でインスタンス化する
 app = Flask(__name__)
@@ -70,8 +71,8 @@ def index():
     message = 'あなたのレシート情報を入力してください'
     # index.html をレンダリングする
     return render_template('index_TechnoMall.html',
-                            message=message,
-                            title=title)
+                           message=message,
+                           title=title)
 
 
 # /page2 にアクセスしたときの処理
@@ -95,7 +96,6 @@ def post():
         rec = list(filtered_receipt['key_word'])
         predict_receipt = rnn_prediction(rec)
         predict_result = predict_receipt.to_html(classes='pred_table')
-
         # index.html をレンダリングする
         return render_template('index_TechnoMall.html',
                                message=message,
@@ -115,6 +115,7 @@ def post():
 
 if __name__ == '__main__':
     load_module()
+    DP.data_load()
     item_len = 5
     app.debug = True  # デバッグモード有効化
-    app.run(host='localhost', port=4444)  # どこからでもアクセス可能に
+    app.run(host='localhost', port=5555)  # どこからでもアクセス可能に

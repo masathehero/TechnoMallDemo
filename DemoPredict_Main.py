@@ -17,15 +17,19 @@ class Params:
 def data_load():
     global prod_info2, filtered_prod, model_path, w2v
     # 推定したものが具体的に何かを特定
-    path_prod_info2 = '/home/jovyan/work/data/technomall_demo_data/prod_info2.csv'
+    # path_prod_info2 = '/home/jovyan/work/data/technomall_demo_data/prod_info2.csv'
+    path_prod_info2 = './technomall_demo_data/prod_info2.csv'
     prod_info2 = pd.read_csv(path_prod_info2, index_col=0)
     # 商品名フィルター結果のロード
-    path_filtered_prod = '/home/jovyan/work/data/prod_name_filter/prod_filter_ver4.csv'
+    # path_filtered_prod = '/home/jovyan/work/data/prod_name_filter/prod_filter_ver4.csv'
+    path_filtered_prod = './technomall_demo_data/prod_filter_ver4.csv'
     filtered_prod = pd.read_csv(path_filtered_prod, index_col=0)
     # モデルのパス
-    model_path = '/home/jovyan/work/code/trained_models/RNNmodel_ep=20_lr=0.001_loss=xent_all'
+    # model_path = '/home/jovyan/work/code/trained_models/RNNmodel_ep=20_lr=0.001_loss=xent_all'
+    model_path = './technomall_demo_data/trained_models/RNNmodel_ep=20_lr=0.001_loss=xent_all'
     # w２vのインポート
-    path_w2v = '/home/jovyan/work/data/word_vec/embedding_size=300_window=100_minc=5_iter=100_filter=ver4.vec'
+    # path_w2v = '/home/jovyan/work/data/word_vec/embedding_size=300_window=100_minc=5_iter=100_filter=ver4.vec'
+    path_w2v = './technomall_demo_data/embedding_size=300_window=100_minc=5_iter=100_filter=ver4.vec'
     w2v = gensim.models.KeyedVectors.load_word2vec_format(path_w2v)
 
 

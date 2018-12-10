@@ -54,7 +54,7 @@
             {% endif %}
           </div>
         </form>
-<!-- この後は結果の表示 -->
+<!-- filtering結果の表示 -->
         {% if filter_result %}
           <style type='text/css'>
             table.filter_table {border-collapse: collapse;}
@@ -64,6 +64,17 @@
             table.filter_table > tbody > tr:nth-child(odd) { background-color: #f0f0f0 }
           </style>
           <p>{{ filter_result|safe }}</p>
+        {% endif %}
+<!-- prediction結果の表示 -->
+        {% if predict_result %}
+          <style type='text/css'>
+            table.pred_table {border-collapse: collapse;}
+            table.pred_table td { padding: 5px }
+            table.pred_table > thead > tr { background-color: #c0c0c0 }
+            table.pred_table > tbody > tr:nth-child(even) { background-color: #e0e0e0 }
+            table.pred_table > tbody > tr:nth-child(odd) { background-color: #f0f0f0 }
+          </style>
+          <p>{{ predict_result|safe }}</p>
         {% endif %}
       </div>
     </div>
