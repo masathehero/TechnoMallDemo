@@ -1,0 +1,72 @@
+{% extends "flask_practice_layout.html" %}
+{% block content %}
+  <!-- Formの表示  -->
+<div class="form">
+  <div class="container">
+    <div class="row">
+      <div class="col-md-12">
+        <p class="lead">
+          {% if message %}
+            {{ message }}
+          {% endif %}
+        </p>
+<!-- 以下は入力フォーム -->
+        <form action="/page2" method="post" class="form-inline">
+          <button type="submit" class="btn btn-default">送信する</button>
+          <div>
+              <label for="item1">商品1</label>
+            {% if it1 %}
+              <input type="text" class="form-control" id="item1" name="item1" value={{ it1 }} placeholder="Product">
+            {% else %}
+              <input type="text" class="form-control" id="item1" name="item1" placeholder="Product">
+            {% endif %}
+          </div>
+          <div>
+              <label for="item2">商品2</label>
+            {% if it2 %}
+              <input type="text" class="form-control" id="item2" name="item2" value={{ it2 }} placeholder="Product">
+            {% else %}
+              <input type="text" class="form-control" id="item2" name="item2" placeholder="Product">
+            {% endif %}
+          </div>
+          <div>
+              <label for="item3">商品3</label>
+            {% if it3 %}
+              <input type="text" class="form-control" id="item3" name="item3" value={{ it3 }} placeholder="Product">
+            {% else %}
+              <input type="text" class="form-control" id="item3" name="item3" placeholder="Product">
+            {% endif %}
+          </div>
+          <div>
+              <label for="item4">商品4</label>
+            {% if it4 %}
+              <input type="text" class="form-control" id="item4" name="item4" value={{ it4 }} placeholder="Product">
+            {% else %}
+              <input type="text" class="form-control" id="item4" name="item4" placeholder="Product">
+            {% endif %}
+          </div>
+          <div>
+              <label for="item5">商品5</label>
+            {% if it5 %}
+              <input type="text" class="form-control" id="item5" name="item5" value={{ it5 }} placeholder="Product">
+            {% else %}
+              <input type="text" class="form-control" id="item5" name="item5" placeholder="Product">
+            {% endif %}
+          </div>
+        </form>
+<!-- この後は結果の表示 -->
+        {% if result %}
+          <style type='text/css'>
+            table.books {border-collapse: collapse;}
+            table.books td { padding: 5px }
+            table.books > thead > tr { background-color: #c0c0c0 }
+            table.books > tbody > tr:nth-child(even) { background-color: #e0e0e0 }
+            table.books > tbody > tr:nth-child(odd) { background-color: #f0f0f0 }
+          </style>
+          <p>{{ result|safe }}</p>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
